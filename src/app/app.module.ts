@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Connection } from 'typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
@@ -7,7 +9,7 @@ import { LoggingInterceptor } from '../shared/Interceptor/logging.interceptor';
 import { TimeoutInterceptor } from '../shared/Interceptor/timeout.interceptor';
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forRoot()],
   controllers: [AppController],
   providers: [
     AppService,
@@ -25,4 +27,6 @@ import { TimeoutInterceptor } from '../shared/Interceptor/timeout.interceptor';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly connection: Connection) {}
+}
