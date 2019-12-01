@@ -1,3 +1,4 @@
+import { get } from 'lodash';
 import {
   Catch,
   ExceptionFilter,
@@ -12,14 +13,14 @@ export class HttpErrorHandler implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest();
     const response = ctx.getResponse();
+    // create message for logging in console
     const message = `[HttpErrorHandler] ${request.method} ${request.url}`;
     Logger.error(message);
     response.status(404).json({
       success: false,
-      statusCode: exception.getStatus(),
       path: request.url,
-      method: request.method,
-      message: 'Invalid url.',
+      message: get(exception, 'message.message', 'Invalid url.'),
+      data: {},
     });
   }
 }

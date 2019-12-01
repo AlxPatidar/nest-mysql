@@ -4,12 +4,13 @@ import { Connection } from 'typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { HttpErrorHandler } from '../shared/Https/http-error.handler';
-import { LoggingInterceptor } from '../shared/Interceptor/logging.interceptor';
-import { TimeoutInterceptor } from '../shared/Interceptor/timeout.interceptor';
+import { HttpErrorHandler } from '../shared/Handlers/http-error.handler';
+import { LoggingInterceptor } from '../shared/Interceptors/logging.interceptor';
+import { TimeoutInterceptor } from '../shared/Interceptors/timeout.interceptor';
+import { ApiModule } from 'src/api/api.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot()],
+  imports: [TypeOrmModule.forRoot(), ApiModule],
   controllers: [AppController],
   providers: [
     AppService,
