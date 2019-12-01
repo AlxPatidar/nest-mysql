@@ -13,6 +13,7 @@ export class HttpErrorHandler implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest();
     const response = ctx.getResponse();
+    // log exception before return to user
     Logger.error({ exception });
     // create message for logging in console
     const message = `[HttpErrorHandler] ${request.method} ${request.url}`;

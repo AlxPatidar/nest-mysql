@@ -19,6 +19,9 @@ async function bootstrap() {
   // Custome validation on request using pipe and class-validator
   app.useGlobalPipes(new CustomValidatePipe());
 
+  // Add prefix to all api for request
+  app.setGlobalPrefix('api/v1');
+
   Logger.log(`🚀  Server ready at http://localhost:${port} `, 'ServerStarted');
   // Run server on port
   await app.listen(port);
