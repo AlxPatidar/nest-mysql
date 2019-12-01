@@ -1,4 +1,3 @@
-import * as Bcrypt from 'bcryptjs';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -44,12 +43,7 @@ export class UsersService {
       email: payload.email,
     });
     if (!newUser) {
-      const salt = await Bcrypt.genSalt(10);
-      const password = await Bcrypt.hash(payload.password, salt);
-      const { identifiers } = await this.userRepository.insert({
-        ...payload,
-        password,
-      });
+      const { identifiers } = await this.userRepository.insert(payload);
       const createUser: User | any = await this.userRepository.findOne(
         identifiers[0].id
       );
