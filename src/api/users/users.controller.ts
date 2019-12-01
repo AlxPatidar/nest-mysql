@@ -14,7 +14,7 @@ export class UsersController {
 
   @Get(':userId')
   getUser(@Param('userId') userId: number): Promise<ResponseData> {
-    return this.usersService.findOne(userId);
+    return this.usersService.findById(userId);
   }
   @Post()
   create(@Body() user: CreateUserDto): Promise<ResponseData> {

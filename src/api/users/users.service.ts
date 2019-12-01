@@ -10,17 +10,19 @@ import { ResponseData } from './interfaces/response.interface';
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>
-  ) { }
+  ) {}
   // Get all user
   async findAll(): Promise<User[]> {
     return this.userRepository.find();
   }
   // Find user by id
-  async findOne(userId: number): Promise<ResponseData> {
+  async findById(userId: number): Promise<ResponseData> {
     const user: User = await this.userRepository.findOne({ id: userId });
     if (user) {
       return {
-        success: true, message: 'User details fetch successfully.', data: user,
+        success: true,
+        message: 'User details fetch successfully.',
+        data: user,
       };
     } else {
       return {
@@ -30,14 +32,27 @@ export class UsersService {
       };
     }
   }
+
+  // Find user details with email id
+  async findOne(email: string): Promise<User | null> {
+    return await this.userRepository.findOne({ email });
+  }
+
   // Create user before save encrypt password
   async create(payload: CreateUserDto): Promise<ResponseData> {
-    const newUser: User = await this.userRepository.findOne({ email: payload.email });
+    const newUser: User = await this.userRepository.findOne({
+      email: payload.email,
+    });
     if (!newUser) {
       const salt = await Bcrypt.genSalt(10);
       const password = await Bcrypt.hash(payload.password, salt);
-      const { identifiers } = await this.userRepository.insert({ ...payload, password });
-      const createUser: User | any = await this.userRepository.findOne(identifiers[0].id);
+      const { identifiers } = await this.userRepository.insert({
+        ...payload,
+        password,
+      });
+      const createUser: User | any = await this.userRepository.findOne(
+        identifiers[0].id
+      );
       return {
         success: true,
         message: 'User created successfully.',
@@ -51,5 +66,4 @@ export class UsersService {
       };
     }
   }
-
 }
