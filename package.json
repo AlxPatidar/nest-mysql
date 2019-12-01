@@ -1,7 +1,7 @@
 {
   "name": "nest-mysql",
-  "version": "0.0.1",
   "description": "",
+  "version": "0.0.1",
   "author": "",
   "license": "MIT",
   "scripts": {
@@ -23,6 +23,7 @@
     "@nestjs/common": "^6.7.2",
     "@nestjs/core": "^6.7.2",
     "@nestjs/platform-express": "^6.7.2",
+    "dotenv": "8.2.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3"
@@ -59,5 +60,22 @@
     },
     "coverageDirectory": "./coverage",
     "testEnvironment": "node"
+  },
+  "lint-staged": {
+    "*.{ts, js,jsx}": [
+      "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+      "tslint --fix \"src/**/*.ts\" \"test/**/*.ts\" -t verbose",
+      "tslint -p tsconfig.json -c tslint.json",
+      "git add"
+    ],
+    "*.{json,md,scss,yaml,yml}": [
+      "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
