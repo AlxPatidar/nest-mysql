@@ -18,6 +18,7 @@ export class Posts {
   body: string;
 
   @Column('integer')
+  // tslint:disable-next-line:variable-name
   user_id: number;
 
   @CreateDateColumn()

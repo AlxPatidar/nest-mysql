@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
+import { IsNotEmpty, MinLength, MaxLength } from 'class-validator';
 
 export class CreatePostDto {
   @IsNotEmpty({ message: 'Title is required' })

@@ -6,12 +6,10 @@ import {
   Body,
   Delete,
   UseGuards,
-  Request,
-  Logger,
   Put,
+  Request,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { Posts } from './entity/posts.entity';
 import { ResponseData } from '../users/users/interfaces/response.interface';
 import { CreatePostDto } from './interfaces/createPost.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -35,13 +33,19 @@ export class PostsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  create(@Body() post: CreatePostDto): Promise<ResponseData> {
-    return this.postsService.create(post, 1);
+  create(
+    @Body() post: CreatePostDto,
+    @Request() { user: { userId } }
+  ): Promise<ResponseData> {
+    return this.postsService.create(post, userId);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Put()
-  update(@Body() post: UpdatePostDto): Promise<ResponseData> {
+  update(
+    @Body() post: UpdatePostDto,
+    @Request() { user: { userId } }
+  ): Promise<ResponseData> {
     return this.postsService.update(post, 1);
   }
 
