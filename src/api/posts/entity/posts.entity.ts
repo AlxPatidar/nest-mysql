@@ -4,10 +4,12 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
+import { UserEntity } from 'src/api/users/users/entity/user.entity';
 
 @Entity('posts')
-export class Posts {
+export class PostEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -18,13 +20,17 @@ export class Posts {
   body: string;
 
   @Column('integer')
-  user_id: number;
+  userId: number;
 
   @CreateDateColumn()
-  // tslint:disable-next-line:variable-name
-  created_at: Date;
+  created: Date;
 
   @UpdateDateColumn()
-  // tslint:disable-next-line:variable-name
-  updated_at: Date;
+  updated: Date;
+
+  @ManyToOne(
+    type => UserEntity,
+    user => user.posts
+  )
+  user: UserEntity;
 }

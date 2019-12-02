@@ -11,7 +11,6 @@ import {
   Put,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { Posts } from './entity/posts.entity';
 import { ResponseData } from '../users/users/interfaces/response.interface';
 import { CreatePostDto } from './interfaces/createPost.dto';
 import { AuthGuard } from '@nestjs/passport';
