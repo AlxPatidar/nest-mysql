@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { User } from './entity/user.entity';
+import { UserEntity } from './entity/user.entity';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './interfaces/createUser.dto';
 import { ResponseData } from './interfaces/response.interface';
@@ -8,7 +8,7 @@ import { ResponseData } from './interfaces/response.interface';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @Get()
-  getUsers(): Promise<User[]> {
+  getUsers(): Promise<UserEntity[]> {
     return this.usersService.findAll();
   }
 

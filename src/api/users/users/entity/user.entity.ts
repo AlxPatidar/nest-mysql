@@ -5,11 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
+  OneToMany,
 } from 'typeorm';
 import * as Bcrypt from 'bcryptjs';
+import { PostEntity } from 'src/api/posts/entity/posts.entity';
 
 @Entity('users')
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -23,18 +25,28 @@ export class User {
   password: string;
 
   @CreateDateColumn()
-  // tslint:disable-next-line:variable-name
-  created_at: Date;
+  created: Date;
 
   @UpdateDateColumn()
-  // tslint:disable-next-line:variable-name
-  updated_at: Date;
+  updated: Date;
+
+  @OneToMany(
+    type => PostEntity,
+    post => post.user
+  )
+  posts: PostEntity[];
 
   @BeforeInsert()
   async encodePassword() {
     const salt = await Bcrypt.genSalt(10);
     this.password = await Bcrypt.hash(this.password, salt);
   }
+  beforeReturn() {
+    const { id, name, email, created } = this;
+    const response: any = { id, name, email, created };
+    return response;
+  }
+
   async checkPassword(password: string): Promise<boolean> {
     return await Bcrypt.compare(password, this.password);
   }

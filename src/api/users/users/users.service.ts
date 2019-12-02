@@ -1,22 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './entity/user.entity';
+import { UserEntity } from './entity/user.entity';
 import { CreateUserDto } from './interfaces/createUser.dto';
 import { ResponseData } from './interfaces/response.interface';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>
   ) {}
   // Get all user
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserEntity[]> {
     return this.userRepository.find();
   }
   // Find user by id
   async findById(userId: number): Promise<ResponseData> {
-    const user: User = await this.userRepository.findOne({ id: userId });
+    const user: UserEntity = await this.userRepository.findOne(
+      { id: userId },
+      { relations: ['posts'] }
+    );
     if (user) {
       return {
         success: true,
@@ -33,18 +37,21 @@ export class UsersService {
   }
 
   // Find user details with email id
-  async findOne(email: string): Promise<User | null> {
-    return await this.userRepository.findOne({ email });
+  async findOne(email: string): Promise<UserEntity | null> {
+    return await this.userRepository.findOne(
+      { email },
+      { relations: ['posts'] }
+    );
   }
 
   // Create user before save encrypt password
   async create(payload: CreateUserDto): Promise<ResponseData> {
-    const newUser: User = await this.userRepository.findOne({
+    const newUser: UserEntity = await this.userRepository.findOne({
       email: payload.email,
     });
     if (!newUser) {
       const { identifiers } = await this.userRepository.insert(payload);
-      const createUser: User | any = await this.userRepository.findOne(
+      const createUser: UserEntity | any = await this.userRepository.findOne(
         identifiers[0].id
       );
       return {

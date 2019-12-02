@@ -1,34 +1,48 @@
+import { map } from 'lodash';
 import { Injectable } from '@nestjs/common';
-import { Posts } from './entity/posts.entity';
+import { PostEntity } from './entity/posts.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ResponseData } from '../users/users/interfaces/response.interface';
 import { CreatePostDto } from './interfaces/createPost.dto';
 import { UpdatePostDto } from './interfaces/updatePost.dto';
+import { UserEntity } from '../users/users/entity/user.entity';
 
 @Injectable()
 export class PostsService {
   constructor(
-    @InjectRepository(Posts) private readonly postRepository: Repository<Posts>
+    @InjectRepository(PostEntity)
+    private readonly postRepository: Repository<PostEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>
   ) {}
+  parseResponse(post: PostEntity): PostEntity {
+    return { ...post, user: post.user.beforeReturn() };
+  }
+
   // Get all posts
   async findAll(): Promise<ResponseData> {
-    const posts: Posts[] = await this.postRepository.find();
+    const posts: PostEntity[] = await this.postRepository.find({
+      relations: ['user'],
+    });
     return {
       success: true,
       message: 'Post details fetch successfully.',
-      data: posts,
+      data: map(posts, post => this.parseResponse(post)),
     };
   }
 
   // Find post by id
   async findById(postId: number): Promise<ResponseData> {
-    const posts: Posts = await this.postRepository.findOne({ id: postId });
-    if (posts) {
+    const post: PostEntity = await this.postRepository.findOne(
+      { id: postId },
+      { relations: ['user'] }
+    );
+    if (post) {
       return {
         success: true,
         message: 'Post details fetch successfully.',
-        data: posts,
+        data: this.parseResponse(post),
       };
     } else {
       return {
@@ -43,19 +57,24 @@ export class PostsService {
   async create(payload: CreatePostDto, userId: number): Promise<ResponseData> {
     const { identifiers } = await this.postRepository.insert({
       ...payload,
-      user_id: userId,
+      userId,
     });
-    const post: Posts = await this.postRepository.findOne(identifiers[0].id);
+    const post: PostEntity = await this.postRepository.findOne(
+      {
+        id: identifiers[0].id,
+      },
+      { relations: ['user'] }
+    );
     return {
       success: true,
       message: 'Post created successfully.',
-      data: post,
+      data: this.parseResponse(post),
     };
   }
 
   // update post with postId
   async update(payload: UpdatePostDto, userId: number): Promise<ResponseData> {
-    const post: Posts = await this.postRepository.findOne({
+    const post: PostEntity = await this.postRepository.findOne({
       id: payload.postId,
     });
     if (post) {
@@ -64,7 +83,7 @@ export class PostsService {
         {
           title: payload.title ? payload.title : post.title,
           body: payload.body ? payload.body : post.body,
-          user_id: userId,
+          userId,
         }
       );
       return {
