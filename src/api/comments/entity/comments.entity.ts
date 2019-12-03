@@ -5,22 +5,24 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  TableForeignKey,
+  OneToOne,
   JoinColumn,
-  OneToMany,
 } from 'typeorm';
 import { UserEntity } from 'src/api/users/users/entity/user.entity';
-import { CommentEntity } from 'src/api/comments/entity/comments.entity';
+import { PostEntity } from 'src/api/posts/entity/posts.entity';
 
-@Entity('posts')
-export class PostEntity {
+@Entity('comments')
+export class CommentEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 50 })
-  title: string;
-
   @Column('text')
-  body: string;
+  comment: string;
+
+  @Column('integer')
+  @JoinColumn()
+  postId: number;
 
   @Column('integer')
   @JoinColumn()
@@ -32,25 +34,24 @@ export class PostEntity {
   @UpdateDateColumn()
   updated: Date;
 
-  // Post belong to user
-  // or many post belong to one user
+  // comment is belongs to user
   @ManyToOne(
     type => UserEntity,
     user => user.posts
   )
   user: UserEntity;
 
-  // One post have many commnets
-  @OneToMany(
-    type => CommentEntity,
-    comment => comment.post
+  // Post belongs to comment
+  @ManyToOne(
+    type => PostEntity,
+    post => post.comments
   )
-  comments: CommentEntity[];
+  post: PostEntity;
 
   // A function for return default data in realation ship
-  parsePostData() {
-    const { id, title, body, userId, created } = this;
-    const response: any = { id, title, body, userId, created };
+  parseCommentData() {
+    const { id, comment, userId, postId, created } = this;
+    const response: any = { id, comment, userId, postId, created };
     return response;
   }
 }
