@@ -19,6 +19,7 @@ import { UpdatePostDto } from './interfaces/updatePost.dto';
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
+  // Find all post and its comment
   @UseGuards(AuthGuard('jwt'))
   @Get()
   findAll(): Promise<ResponseData> {
@@ -31,6 +32,7 @@ export class PostsController {
     return this.postsService.findById(postId);
   }
 
+  // Create post data for create new post
   @UseGuards(AuthGuard('jwt'))
   @Post()
   create(
@@ -40,13 +42,14 @@ export class PostsController {
     return this.postsService.create(post, userId);
   }
 
+  // update post detail
   @UseGuards(AuthGuard('jwt'))
   @Put()
   update(
     @Body() post: UpdatePostDto,
     @Request() { user: { userId } }
   ): Promise<ResponseData> {
-    return this.postsService.update(post, 1);
+    return this.postsService.update(post, userId);
   }
 
   // Delete post using postId
