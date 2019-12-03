@@ -3,10 +3,16 @@ import { UserEntity } from './entity/user.entity';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './interfaces/createUser.dto';
 import { ResponseData } from './interfaces/response.interface';
+import { ApiCreatedResponse } from '@nestjs/swagger';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
+
+  @ApiCreatedResponse({
+    status: 200,
+    description: 'User details fetch successfully.',
+  })
   @Get()
   getUsers(): Promise<UserEntity[]> {
     return this.usersService.findAll();
