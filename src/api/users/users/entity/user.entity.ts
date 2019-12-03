@@ -30,18 +30,21 @@ export class UserEntity {
   @UpdateDateColumn()
   updated: Date;
 
+  // one user have many posts
   @OneToMany(
     type => PostEntity,
     post => post.user
   )
   posts: PostEntity[];
-
+  
+  // encode password for security before save
   @BeforeInsert()
   async encodePassword() {
     const salt = await Bcrypt.genSalt(10);
     this.password = await Bcrypt.hash(this.password, salt);
   }
-  beforeReturn() {
+  // A function for return default data in realation ship
+  parseUserData() {
     const { id, name, email, created } = this;
     const response: any = { id, name, email, created };
     return response;

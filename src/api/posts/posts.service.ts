@@ -1,4 +1,4 @@
-import { map } from 'lodash';
+import { get, map } from 'lodash';
 import { Injectable } from '@nestjs/common';
 import { PostEntity } from './entity/posts.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,24 +6,24 @@ import { Repository } from 'typeorm';
 import { ResponseData } from '../users/users/interfaces/response.interface';
 import { CreatePostDto } from './interfaces/createPost.dto';
 import { UpdatePostDto } from './interfaces/updatePost.dto';
-import { UserEntity } from '../users/users/entity/user.entity';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(PostEntity)
     private readonly postRepository: Repository<PostEntity>,
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>
-  ) {}
-  parseResponse(post: PostEntity): PostEntity {
-    return { ...post, user: post.user.beforeReturn() };
+  ) { }
+  parseResponse(post: PostEntity) {
+    const comments = map(get(post, 'comments', []), comment => {
+      return { ...comment, user: comment.user.parseUserData() };
+    });
+    return { ...post, user: post.user.parseUserData(), comments };
   }
 
   // Get all posts
   async findAll(): Promise<ResponseData> {
     const posts: PostEntity[] = await this.postRepository.find({
-      relations: ['user'],
+      relations: ['user', 'comments', 'comments.user'],
     });
     return {
       success: true,
@@ -36,7 +36,7 @@ export class PostsService {
   async findById(postId: number): Promise<ResponseData> {
     const post: PostEntity = await this.postRepository.findOne(
       { id: postId },
-      { relations: ['user'] }
+      { relations: ['user', 'comments', 'comments.user'] }
     );
     if (post) {
       return {
